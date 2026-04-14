@@ -1,7 +1,6 @@
 export type RegularLevel = 'full' | 'half' | 'low';
 export type VariableUnit = 'g' | 'ml' | 'kg' | 'l' | 'tsp' | 'tbsp' | 'whole';
 export type IngredientTier = 1 | 2 | 3;
-export type MealSlotType = 'breakfast' | 'lunch' | 'dinner';
 export type ShopCategory = 'produce' | 'tins' | 'grains' | 'dairy' | 'protein' | 'condiments' | 'other';
 
 export interface StapleItem { name: string; }
@@ -27,7 +26,7 @@ export interface Recipe {
 }
 
 export interface PlannedMeal { id: string; recipeId: string; servings: number; }
-export type DayPlan = { [K in MealSlotType]: PlannedMeal | null; };
+export type DayPlan = PlannedMeal[];
 export type WeekPlan = { [isoDate: string]: DayPlan; };
 
 export interface ShopItem {

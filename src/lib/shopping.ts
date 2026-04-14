@@ -28,8 +28,7 @@ export function generateShopList(weekPlan: WeekPlan, recipes: Recipe[], pantry: 
   const needs = new Map<string, { baseAmount: number; unit: VariableUnit; tier: number }>();
 
   for (const dayPlan of Object.values(weekPlan)) {
-    for (const meal of Object.values(dayPlan)) {
-      if (!meal) continue;
+    for (const meal of dayPlan) {
       const recipe = recipes.find(r => r.id === meal.recipeId);
       if (!recipe) continue;
       const scale = meal.servings / recipe.servings;

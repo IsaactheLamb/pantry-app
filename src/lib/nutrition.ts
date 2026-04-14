@@ -33,8 +33,7 @@ export function aggregateNutrition(weekPlan: WeekPlan, recipes: Recipe[]): WeekN
   for (const [date, dayPlan] of Object.entries(weekPlan)) {
     let dayMacros = emptyMacros();
     let dayMicros = emptyMicros();
-    for (const meal of Object.values(dayPlan)) {
-      if (!meal) continue;
+    for (const meal of dayPlan) {
       const recipe = recipes.find(r => r.id === meal.recipeId);
       if (!recipe) continue;
       const scale = meal.servings / recipe.servings;

@@ -2,7 +2,7 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { v4 as uuidv4 } from 'uuid';
-import { Pantry, Recipe, WeekPlan, ShopItem, MealSlotType, PlannedMeal, RegularLevel, VariableUnit, AppSnapshot } from './types';
+import { Pantry, Recipe, WeekPlan, ShopItem, PlannedMeal, RegularLevel, VariableUnit, AppSnapshot } from './types';
 import { DEFAULT_PANTRY, DEFAULT_RECIPES } from './defaults';
 import { generateShopList } from './shopping';
 
@@ -27,8 +27,10 @@ interface PantryAppState {
   updateRecipe(id: string, patch: Partial<Recipe>): void;
   deleteRecipe(id: string): void;
 
-  setPlannedMeal(date: string, slot: MealSlotType, meal: PlannedMeal | null): void;
-  movePlannedMeal(fromDate: string, fromSlot: MealSlotType, toDate: string, toSlot: MealSlotType): void;
+  addMeal(date: string, meal: PlannedMeal): void;
+  removeMeal(date: string, mealId: string): void;
+  moveMeal(fromDate: string, mealId: string, toDate: string): void;
+  reorderMeal(date: string, fromIndex: number, toIndex: number): void;
   clearWeekPlan(): void;
 
   regenerateShopList(): void;
@@ -104,24 +106,28 @@ export const useStore = create<PantryAppState>()(
       })),
       deleteRecipe: (id) => set(s => ({ recipes: s.recipes.filter(r => r.id !== id) })),
 
-      setPlannedMeal: (date, slot, meal) => set(s => {
-        const existing = s.weekPlan[date] ?? { breakfast: null, lunch: null, dinner: null };
+      addMeal: (date, meal) => set(s => ({
+        weekPlan: { ...s.weekPlan, [date]: [...(s.weekPlan[date] ?? []), meal] },
+      })),
+      removeMeal: (date, mealId) => set(s => ({
+        weekPlan: { ...s.weekPlan, [date]: (s.weekPlan[date] ?? []).filter(m => m.id !== mealId) },
+      })),
+      moveMeal: (fromDate, mealId, toDate) => set(s => {
+        const meal = (s.weekPlan[fromDate] ?? []).find(m => m.id === mealId);
+        if (!meal) return s;
         return {
           weekPlan: {
             ...s.weekPlan,
-            [date]: { ...existing, [slot]: meal },
+            [fromDate]: (s.weekPlan[fromDate] ?? []).filter(m => m.id !== mealId),
+            [toDate]: [...(s.weekPlan[toDate] ?? []), meal],
           },
         };
       }),
-      movePlannedMeal: (fromDate, fromSlot, toDate, toSlot) => set(s => {
-        const meal = s.weekPlan[fromDate]?.[fromSlot];
-        if (!meal) return s;
-        const newPlan = { ...s.weekPlan };
-        const fromDay = newPlan[fromDate] ?? { breakfast: null, lunch: null, dinner: null };
-        newPlan[fromDate] = { ...fromDay, [fromSlot]: null };
-        const toDay = newPlan[toDate] ?? { breakfast: null, lunch: null, dinner: null };
-        newPlan[toDate] = { ...toDay, [toSlot]: meal };
-        return { weekPlan: newPlan };
+      reorderMeal: (date, fromIndex, toIndex) => set(s => {
+        const day = [...(s.weekPlan[date] ?? [])];
+        const [moved] = day.splice(fromIndex, 1);
+        day.splice(toIndex, 0, moved);
+        return { weekPlan: { ...s.weekPlan, [date]: day } };
       }),
       clearWeekPlan: () => set({ weekPlan: {} }),
 
@@ -153,7 +159,7 @@ export const useStore = create<PantryAppState>()(
       },
     }),
     {
-      name: 'pantry-app-v1',
+      name: 'pantry-app-v2',
       storage: createJSONStorage(() => (typeof window !== 'undefined' ? localStorage : { getItem: () => null, setItem: () => {}, removeItem: () => {} } as any)),
     }
   )
