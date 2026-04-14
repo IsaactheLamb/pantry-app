@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useStore } from '@/lib/store';
 import { checkCookable } from '@/lib/cookable';
+import TimerButton from '@/components/TimerButton';
 
 function fmt(n: number): string {
   return n % 1 === 0 ? String(n) : n.toFixed(1);
@@ -94,7 +95,7 @@ export default function RecipeDetailPage({ params }: { params: Promise<{ id: str
               <span className="flex-shrink-0 w-6 h-6 bg-green-600 text-white rounded-full text-xs flex items-center justify-center font-semibold">{i+1}</span>
               <div>
                 <p className="text-sm text-gray-800 leading-relaxed">{step.text}</p>
-                {step.timerSeconds && <span className="text-xs text-gray-400 mt-1 block">⏱ {Math.floor(step.timerSeconds/60)} min</span>}
+                {step.timerSeconds && <TimerButton seconds={step.timerSeconds} />}
               </div>
             </li>
           ))}

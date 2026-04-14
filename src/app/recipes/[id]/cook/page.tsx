@@ -4,25 +4,7 @@ import { use } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useStore } from '@/lib/store';
 import { useWakeLock } from '@/hooks/useWakeLock';
-import { useTimer } from '@/hooks/useTimer';
-
-function TimerButton({ seconds }: { seconds: number }) {
-  const { remaining, running, start, pause, reset, done } = useTimer(seconds);
-  const mins = Math.floor(remaining / 60);
-  const secs = remaining % 60;
-  return (
-    <div className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-sm mt-2 ${done ? 'bg-green-100 text-green-700' : 'bg-amber-50 text-amber-700'}`}>
-      <span className="font-mono">{mins}:{String(secs).padStart(2,'0')}</span>
-      {!done && (
-        <button className="font-medium" onClick={running ? pause : start}>
-          {running ? '⏸' : '▶'}
-        </button>
-      )}
-      {done && <span>✓ Done!</span>}
-      <button className="text-gray-400 text-xs" onClick={reset}>↺</button>
-    </div>
-  );
-}
+import TimerButton from '@/components/TimerButton';
 
 function CookModeContent({ id, servings }: { id: string; servings: number }) {
   const router = useRouter();
