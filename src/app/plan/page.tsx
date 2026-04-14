@@ -1,5 +1,5 @@
 'use client';
-import { useState, useMemo } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useStore } from '@/lib/store';
 import { MealSlotType, PlannedMeal, Recipe } from '@/lib/types';
 import { DndContext, useSensor, useSensors, PointerSensor, DragEndEvent, useDroppable, useDraggable } from '@dnd-kit/core';
@@ -142,15 +142,15 @@ export default function PlanPage() {
             ))}
             {/* Rows */}
             {SLOTS.map(slot => (
-              <>
-                <div key={slot} className="text-xs text-gray-500 capitalize flex items-center">{slot.slice(0,3)}</div>
+              <React.Fragment key={slot}>
+                <div className="text-xs text-gray-500 capitalize flex items-center">{slot.slice(0,3)}</div>
                 {weekDates.map(date => (
                   <MealSlotCell key={`${date}:${slot}`} date={date} slot={slot}
                     meal={weekPlan[date]?.[slot] ?? null} recipes={recipes}
                     onAdd={() => setAddTarget({ date, slot })}
                     onRemove={() => setPlannedMeal(date, slot, null)} />
                 ))}
-              </>
+              </React.Fragment>
             ))}
           </div>
         </div>
