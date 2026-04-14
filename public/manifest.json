@@ -1,0 +1,12 @@
+{
+  "name": "Pantry App",
+  "short_name": "Pantry",
+  "start_url": "/pantry",
+  "display": "standalone",
+  "background_color": "#f9fafb",
+  "theme_color": "#16a34a",
+  "icons": [
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png" }
+  ]
+}
